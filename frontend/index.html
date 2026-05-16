@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHunt — Remote Jobs Aggregator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --green: #22c55e;
+            --orange: #f97316;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Main */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .category-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+        }
+
+        .category-btn:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .category-btn.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .category-btn .emoji {
+            font-size: 1.1rem;
+        }
+
+        .source-filters {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .source-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.825rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+        }
+
+        .source-btn:hover { background: var(--surface); color: var(--text); }
+        .source-btn.active { background: var(--surface-hover); color: var(--text); font-weight: 500; }
+
+        .source-btn .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        /* Jobs Grid */
+        .jobs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .jobs-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .jobs-count {
+            background: var(--surface);
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .jobs-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .job-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .job-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .job-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .job-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .job-company {
+            font-size: 0.9rem;
+            color: var(--accent-light);
+            font-weight: 500;
+        }
+
+        .job-source-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .badge-remotive { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+        .badge-arbeitnow { background: rgba(249, 115, 22, 0.15); color: var(--orange); }
+        .badge-remoteok { background: rgba(236, 72, 153, 0.15); color: var(--pink); }
+        .badge-unknown { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+
+        .job-desc {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .job-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .job-tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-light);
+            border-radius: 4px;
+        }
+
+        .job-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state .emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .footer a { color: var(--accent-light); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                position: static;
+                display: flex;
+                gap: 0.5rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .sidebar h3, .source-filters { display: none; }
+
+            .category-btn {
+                white-space: nowrap;
+                width: auto;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box { max-width: none; }
+
+            .stats-bar { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">💼</div>
+                <span>JobHunt</span>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search jobs, skills, companies...">
+            </div>
+            <div class="stats-bar" id="statsBar">
+                <div class="stat">
+                    <div class="stat-dot" style="background: var(--green)"></div>
+                    <span id="statRemotive">—</span>
+                </div>
+                <div class="stat">
+                    <div class="stat-dot" style="background: var(--orange)"></div>
+                    <span id="statArbeitnow">—</span>
+                </div>
+                <div class="stat">
+                    <div class="stat-dot" style="background: var(--pink)"></div>
+                    <span id="statRemoteOK">—</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <aside class="sidebar">
+            <h3>Categories</h3>
+            <div id="categories">
+                <button class="category-btn active" data-cat="all">
+                    <span class="emoji">🌐</span> All Jobs
+                </button>
+                <button class="category-btn" data-cat="software-development">
+                    <span class="emoji">💻</span> Software Dev
+                </button>
+                <button class="category-btn" data-cat="data-science">
+                    <span class="emoji">📊</span> Data Science
+                </button>
+                <button class="category-btn" data-cat="design">
+                    <span class="emoji">🎨</span> Design
+                </button>
+                <button class="category-btn" data-cat="marketing">
+                    <span class="emoji">📣</span> Marketing
+                </button>
+                <button class="category-btn" data-cat="devops">
+                    <span class="emoji">⚙️</span> DevOps
+                </button>
+                <button class="category-btn" data-cat="ai-ml">
+                    <span class="emoji">🤖</span> AI / ML
+                </button>
+                <button class="category-btn" data-cat="data-annotation">
+                    <span class="emoji">📝</span> Data Annotation
+                </button>
+                <button class="category-btn" data-cat="customer-support">
+                    <span class="emoji">🎧</span> Support
+                </button>
+            </div>
+            <div class="source-filters">
+                <h3>Sources</h3>
+                <button class="source-btn active" data-source="">
+                    <div class="dot" style="background: var(--accent)"></div> All Sources
+                </button>
+                <button class="source-btn" data-source="Remotive">
+                    <div class="dot" style="background: var(--green)"></div> Remotive
+                </button>
+                <button class="source-btn" data-source="Arbeitnow">
+                    <div class="dot" style="background: var(--orange)"></div> Arbeitnow
+                </button>
+                <button class="source-btn" data-source="RemoteOK">
+                    <div class="dot" style="background: var(--pink)"></div> RemoteOK
+                </button>
+            </div>
+        </aside>
+
+        <section>
+            <div class="jobs-header">
+                <h2 id="sectionTitle">All Remote Jobs</h2>
+                <span class="jobs-count" id="jobsCount">Loading...</span>
+            </div>
+            <div id="jobsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Fetching jobs from multiple sources...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Built by <a href="https://github.com/antorm1" target="_blank">Antorm</a> · 
+           Jobs aggregated from Remotive, Arbeitnow & RemoteOK · 
+           <a href="https://github.com/antorm1/job-hunt-app" target="_blank">GitHub</a>
+        </p>
+    </footer>
+
+    <script>
+        const API_URL = "http://localhost:8000/api";
+        let currentCategory = "all";
+        let currentSource = "";
+        let currentSearch = "";
+        let allJobs = [];
+
+        const categoryNames = {
+            "all": "All Remote Jobs",
+            "software-development": "Software Development Jobs",
+            "data-science": "Data Science Jobs",
+            "design": "Design Jobs",
+            "marketing": "Marketing Jobs",
+            "devops": "DevOps Jobs",
+            "ai-ml": "AI / ML Jobs",
+            "data-annotation": "Data Annotation Jobs",
+            "customer-support": "Customer Support Jobs",
+        };
+
+        function badgeClass(source) {
+            const map = { "Remotive": "badge-remotive", "Arbeitnow": "badge-arbeitnow", "RemoteOK": "badge-remoteok" };
+            return map[source] || "badge-unknown";
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return "";
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d)) return "";
+                const now = new Date();
+                const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+                if (diff === 0) return "Today";
+                if (diff === 1) return "1 day ago";
+                if (diff < 7) return `${diff}d ago`;
+                if (diff < 30) return `${Math.floor(diff / 7)}w ago`;
+                return d.toLocaleDateString();
+            } catch { return ""; }
+        }
+
+        function renderJobs(jobs) {
+            const container = document.getElementById("jobsContainer");
+            const countEl = document.getElementById("jobsCount");
+
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">🔭</div>
+                        <h3>No jobs found</h3>
+                        <p>Try a different category or search term</p>
+                    </div>`;
+                countEl.textContent = "0 jobs";
+                return;
+            }
+
+            countEl.textContent = `${jobs.length} jobs`;
+
+            container.innerHTML = `<div class="jobs-grid">` +
+                jobs.map(job => `
+                    <a href="${job.url}" target="_blank" rel="noopener" class="job-card">
+                        <div class="job-card-top">
+                            <div>
+                                <div class="job-title">${job.title}</div>
+                                <div class="job-company">${job.company}</div>
+                            </div>
+                            <span class="job-source-badge ${badgeClass(job.source)}">${job.source}</span>
+                        </div>
+                        <p class="job-desc">${job.description}</p>
+                        <div class="job-footer">
+                            <div class="job-tags">
+                                ${(job.tags || []).slice(0, 4).map(t => `<span class="tag">${t}</span>`).join("")}
+                            </div>
+                            <div class="job-meta">
+                                ${job.salary ? `<span>💰 ${job.salary}</span>` : ""}
+                                <span>📍 ${job.location || "Remote"}</span>
+                                ${job.posted_date ? `<span>📅 ${formatDate(job.posted_date)}</span>` : ""}
+                            </div>
+                        </div>
+                    </a>
+                `).join("") +
+                `</div>`;
+        }
+
+        async function fetchJobs() {
+            const params = new URLSearchParams();
+            if (currentCategory !== "all") params.set("category", currentCategory);
+            if (currentSearch) params.set("search", currentSearch);
+            if (currentSource) params.set("source", currentSource);
+
+            try {
+                const resp = await fetch(`${API_URL}/jobs?${params}`);
+                const data = await resp.json();
+                allJobs = data.jobs;
+                renderJobs(data.jobs);
+            } catch (err) {
+                document.getElementById("jobsContainer").innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">⚠️</div>
+                        <h3>Could not connect to API</h3>
+                        <p>Make sure the backend is running: <code>cd backend && python main.py</code></p>
+                    </div>`;
+            }
+        }
+
+        async function fetchStats() {
+            try {
+                const resp = await fetch(`${API_URL}/stats`);
+                const data = await resp.json();
+                document.getElementById("statRemotive").textContent = `${data.sources.Remotive || 0}`;
+                document.getElementById("statArbeitnow").textContent = `${data.sources.Arbeitnow || 0}`;
+                document.getElementById("statRemoteOK").textContent = `${data.sources.RemoteOK || 0}`;
+            } catch { /* silently fail */ }
+        }
+
+        // Category buttons
+        document.querySelectorAll(".category-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentCategory = btn.dataset.cat;
+                document.getElementById("sectionTitle").textContent = categoryNames[currentCategory] || "All Jobs";
+                fetchJobs();
+            });
+        });
+
+        // Source buttons
+        document.querySelectorAll(".source-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".source-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentSource = btn.dataset.source;
+                fetchJobs();
+            });
+        });
+
+        // Search with debounce
+        let searchTimeout;
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentSearch = e.target.value.trim();
+                fetchJobs();
+            }, 400);
+        });
+
+        // Initial load
+        fetchStats();
+        fetchJobs();
+    </script>
+</body>
+</html>
